@@ -10,7 +10,7 @@ public class PasswordGenerator {
     public static final String SPECIAL_SYMBOLS = "!@#$%^&*()-_=+[]{};:,.<>/?";
 
     // the random class allows us to generate a random number which will be used to randomly choose the characters
-    private final Random random;
+    private final Random random; 
 
     // constructor
     public PasswordGenerator(){random = new Random();}
