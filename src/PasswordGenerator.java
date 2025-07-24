@@ -3,7 +3,7 @@ import java.util.Random;
 // this class works as the backend and will generate the password
 public class PasswordGenerator {
     // character pools
-    // these strings will hold the characters/numbers/symbols that we are going to randomly pick to generate our password
+    // these strings will hold the characters/numbers/symbols that we are going to randomly pick to generate our password 
     public static final String LOWERCASE_CHARACTERS = "abcdefghijklmnopqrstuvwxyz"; 
     public static final String UPPERCASE_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     public static final String NUMBERS = "012345679";
