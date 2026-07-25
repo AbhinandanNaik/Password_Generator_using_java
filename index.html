@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SentinelKey Enterprise - Password & Secrets Suite</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome / Lucide Icons SVG icons embed -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="clean-theme">
+    <!-- Main Application Container -->
+    <div class="app-wrapper">
+        <!-- Header Nav -->
+        <header class="app-header">
+            <div class="logo-container">
+                <div class="shield-logo">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <path d="m9 12 2 2 4-4"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="brand-title">SentinelKey <span class="badge-enterprise">Enterprise</span></h1>
+                    <p class="brand-subtitle">Zero-Knowledge Security & Password Suite</p>
+                </div>
+            </div>
+
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-target="tab-generator">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    Generator
+                </button>
+                <button class="nav-tab" data-target="tab-vault">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                    Vault & Secrets
+                </button>
+                <button class="nav-tab" data-target="tab-audit">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    Security Audit
+                </button>
+                <button class="nav-tab" data-target="tab-totp">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    2FA Authenticator
+                </button>
+                <button class="nav-tab" data-target="tab-backup">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Export & Backup
+                </button>
+            </nav>
+
+            <div class="vault-status-indicator" id="vault-status-badge">
+                <span class="status-dot green"></span>
+                <span id="vault-lock-text">Vault Unlocked</span>
+            </div>
+        </header>
+
+        <!-- Main Content View Areas -->
+        <main class="content-area">
+
+            <!-- TAB 1: PASSWORD & SECRETS GENERATOR -->
+            <section id="tab-generator" class="tab-content active">
+                <div class="grid-2col">
+                    <!-- Left Control Panel -->
+                    <div class="glass-card generator-card">
+                        <div class="card-header">
+                            <h2>Secrets Generator</h2>
+                            <!-- Mode selector buttons -->
+                            <div class="mode-selector">
+                                <button class="mode-btn active" data-mode="password">Password</button>
+                                <button class="mode-btn" data-mode="passphrase">Passphrase</button>
+                                <button class="mode-btn" data-mode="apikey">API Key</button>
+                                <button class="mode-btn" data-mode="ssh">SSH Key</button>
+                                <button class="mode-btn" data-mode="uuid">UUID</button>
+                            </div>
+                        </div>
+
+                        <!-- Generated Output Area -->
+                        <div class="output-display-box">
+                            <div class="output-text-container">
+                                <span id="generated-output" class="font-mono">Generating...</span>
+                            </div>
+                            <div class="output-actions">
+                                <button id="btn-refresh" class="icon-btn" title="Generate New">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                                </button>
+                                <button id="btn-copy" class="btn btn-primary" title="Copy to Clipboard">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    Copy Secret
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Strength bar indicator -->
+                        <div class="strength-bar-container">
+                            <div class="strength-labels">
+                                <span>Strength: <strong id="strength-text">Very Strong</strong></span>
+                                <span id="entropy-badge" class="badge">98.4 Bits</span>
+                            </div>
+                            <div class="meter-track">
+                                <div id="strength-meter-fill" class="meter-fill" style="width: 85%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Password Options (Dynamic based on mode) -->
+                        <div id="options-password-container" class="options-group">
+                            <div class="slider-control">
+                                <div class="slider-header">
+                                    <label for="length-slider">Length: <span id="length-val">24</span> characters</label>
+                                </div>
+                                <input type="range" id="length-slider" min="4" max="128" value="24" class="custom-range">
+                            </div>
+
+                            <div class="checkbox-grid">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" id="chk-uppercase" checked>
+                                    <span class="checkmark"></span>
+                                    Uppercase (A-Z)
+                                </label>
+
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" id="chk-lowercase" checked>
+                                    <span class="checkmark"></span>
+                                    Lowercase (a-z)
+                                </label>
+
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" id="chk-numbers" checked>
+                                    <span class="checkmark"></span>
+                                    Numbers (0-9)
+                                </label>
+
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" id="chk-symbols" checked>
+                                    <span class="checkmark"></span>
+                                    Symbols (!@#$%^&*)
+                                </label>
+
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" id="chk-no-ambiguous">
+                                    <span class="checkmark"></span>
+                                    Exclude Ambiguous (l, 1, I, O, 0)
+                                </label>
+
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" id="chk-pronounceable">
+                                    <span class="checkmark"></span>
+                                    Phonetic / Readable
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Passphrase specific options -->
+                        <div id="options-passphrase-container" class="options-group hidden">
+                            <div class="slider-control">
+                                <label for="word-count-slider">Word Count: <span id="word-count-val">5</span> words</label>
+                                <input type="range" id="word-count-slider" min="3" max="12" value="5" class="custom-range">
+                            </div>
+                            <div class="form-row">
+                                <label for="passphrase-separator">Separator:</label>
+                                <select id="passphrase-separator" class="custom-select">
+                                    <option value="-">Hyphen (-)</option>
+                                    <option value=".">Period (.)</option>
+                                    <option value="_">Underscore (_)</option>
+                                    <option value=" ">Space ( )</option>
+                                    <option value="#">Hash (#)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Quick Save to Vault Button -->
+                        <div class="card-footer">
+                            <button id="btn-save-to-vault" class="btn btn-outline btn-full">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                Save Secret to Zero-Knowledge Vault
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Right Analytics & Security Audit Panel -->
+                    <div class="glass-card analytics-card">
+                        <div class="card-header">
+                            <h2>Cryptographic Entropy & Vulnerability Analysis</h2>
+                        </div>
+
+                        <div class="metrics-grid">
+                            <div class="metric-box">
+                                <span class="metric-title">Shannon Entropy</span>
+                                <span id="analysis-entropy" class="metric-value text-cyan">98.4 bits</span>
+                                <span class="metric-sub">Ideal > 60 bits for Enterprise</span>
+                            </div>
+
+                            <div class="metric-box">
+                                <span class="metric-title">Character Pool</span>
+                                <span id="analysis-pool" class="metric-value">94 symbols</span>
+                                <span class="metric-sub">Combinations: <span id="analysis-combinations">1.2 × 10⁴⁷</span></span>
+                            </div>
+                        </div>
+
+                        <div class="crack-time-section">
+                            <h3>Estimated Brute-Force Crack Times</h3>
+                            <div class="crack-time-list">
+                                <div class="crack-time-item">
+                                    <div class="crack-meta">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/></svg>
+                                        <span>Offline GPU Cluster (10¹¹ H/s)</span>
+                                    </div>
+                                    <strong id="time-gpu" class="crack-val text-green">3.8 Trillion Years</strong>
+                                </div>
+
+                                <div class="crack-time-item">
+                                    <div class="crack-meta">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                                        <span>Online API Throttled (100 H/s)</span>
+                                    </div>
+                                    <strong id="time-online" class="crack-val text-green">Infinite</strong>
+                                </div>
+
+                                <div class="crack-time-item">
+                                    <div class="crack-meta">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                        <span>Quantum Grover Attack</span>
+                                    </div>
+                                    <strong id="time-quantum" class="crack-val text-cyan">42,000 Years</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Compliance Checklist -->
+                        <div class="compliance-box">
+                            <h3>NIST SP 800-63B Compliance Checklist</h3>
+                            <ul class="compliance-list">
+                                <li id="nist-len" class="pass"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Minimum 12+ characters length</li>
+                                <li id="nist-entropy" class="pass"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> High character space diversity</li>
+                                <li id="nist-dict" class="pass"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> No common dictionary sequence detected</li>
+                                <li id="nist-rep" class="pass"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Free of sequential character repetition</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: ZERO-KNOWLEDGE VAULT & SECRETS MANAGER -->
+            <section id="tab-vault" class="tab-content">
+                <div class="glass-card full-width-card">
+                    <div class="card-header vault-header">
+                        <div>
+                            <h2>Enterprise Zero-Knowledge Vault</h2>
+                            <p class="section-desc">Client-side AES-256-GCM encrypted local storage. Master key is derived using PBKDF2 (100k iterations).</p>
+                        </div>
+                        <div class="vault-header-actions">
+                            <input type="text" id="vault-search" placeholder="Search secrets by title, username, or tag..." class="search-input">
+                            <button id="btn-add-secret" class="btn btn-primary">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                Add New Secret
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Category Pills -->
+                    <div class="category-pills">
+                        <button class="pill-btn active" data-cat="ALL">All Items (<span id="cat-count-all">0</span>)</button>
+                        <button class="pill-btn" data-cat="Logins">Logins</button>
+                        <button class="pill-btn" data-cat="API Keys">API Keys</button>
+                        <button class="pill-btn" data-cat="SSH Keys">SSH Keys</button>
+                        <button class="pill-btn" data-cat="Secure Notes">Secure Notes</button>
+                        <button class="pill-btn" data-cat="Credit Cards">Credit Cards</button>
+                    </div>
+
+                    <!-- Secrets Table Grid -->
+                    <div class="vault-list-container">
+                        <table class="vault-table">
+                            <thead>
+                                <tr>
+                                    <th>Title & Category</th>
+                                    <th>Username / Key Identifier</th>
+                                    <th>Password / Secret</th>
+                                    <th>2FA Status</th>
+                                    <th>Last Modified</th>
+                                    <th class="text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vault-items-body">
+                                <!-- Dynamic Rendered Vault Items -->
+                            </tbody>
+                        </table>
+
+                        <div id="vault-empty-state" class="empty-state">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            <h3>Your Vault is Empty</h3>
+                            <p>Generate passwords and click "Save Secret to Zero-Knowledge Vault" or click "Add New Secret" above.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: SECURITY AUDIT SCORECARD -->
+            <section id="tab-audit" class="tab-content">
+                <div class="glass-card full-width-card">
+                    <div class="card-header">
+                        <h2>Vault Security Audit Scorecard</h2>
+                        <p class="section-desc">Real-time enterprise vulnerability scan across all stored credentials.</p>
+                    </div>
+
+                    <div class="audit-summary-grid">
+                        <div class="audit-score-card">
+                            <div class="radial-progress-wrapper">
+                                <svg class="radial-progress" viewBox="0 0 36 36">
+                                    <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    <path id="audit-radial-path" class="circle-fill green" stroke-dasharray="92, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    <text x="18" y="20.35" class="percentage" id="audit-score-text">92%</text>
+                                </svg>
+                            </div>
+                            <h3>Security Score</h3>
+                            <p id="audit-rating-text" class="text-green font-bold">EXCELLENT</p>
+                        </div>
+
+                        <div class="audit-metrics-column">
+                            <div class="audit-metric-row">
+                                <span class="metric-name">Total Vault Secrets</span>
+                                <strong id="audit-total-items" class="metric-val">0</strong>
+                            </div>
+                            <div class="audit-metric-row">
+                                <span class="metric-name">Weak / Low-Entropy (< 50 bits)</span>
+                                <strong id="audit-weak-items" class="metric-val text-red">0</strong>
+                            </div>
+                            <div class="audit-metric-row">
+                                <span class="metric-name">Reused Passwords</span>
+                                <strong id="audit-reused-items" class="metric-val text-amber">0</strong>
+                            </div>
+                            <div class="audit-metric-row">
+                                <span class="metric-name">Missing 2FA / TOTP</span>
+                                <strong id="audit-no-2fa-items" class="metric-val text-cyan">0</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="audit-details-table">
+                        <h3>Detailed Vault Vulnerability Report</h3>
+                        <table class="vault-table">
+                            <thead>
+                                <tr>
+                                    <th>Item Name</th>
+                                    <th>Entropy Score</th>
+                                    <th>Reuse Check</th>
+                                    <th>NIST Status</th>
+                                    <th>Action Recommended</th>
+                                </tr>
+                            </thead>
+                            <tbody id="audit-table-body">
+                                <!-- Dynamic audit items -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: 2FA / TOTP AUTHENTICATOR -->
+            <section id="tab-totp" class="tab-content">
+                <div class="grid-2col">
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h2>2FA / TOTP Live Authenticator</h2>
+                            <p class="section-desc">Generate RFC 6238 compliant 6-digit Time-based One-Time Passcodes.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="totp-secret-input">Enter Base32 Secret Key (e.g., JBSWY3DPEHPK3PXP):</label>
+                            <input type="text" id="totp-secret-input" placeholder="JBSWY3DPEHPK3PXP" class="custom-input font-mono">
+                        </div>
+
+                        <div class="totp-display-card">
+                            <span class="totp-label">CURRENT PASSCODE</span>
+                            <div class="totp-code-large font-mono" id="totp-live-code">------</div>
+                            
+                            <div class="totp-timer-container">
+                                <div class="totp-timer-bar">
+                                    <div id="totp-progress-fill" class="totp-progress" style="width: 100%;"></div>
+                                </div>
+                                <span id="totp-seconds-remaining">Expires in 30s</span>
+                            </div>
+
+                            <button id="btn-copy-totp" class="btn btn-outline margin-top">
+                                Copy 2FA Code
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h2>Stored Vault 2FA Keys</h2>
+                        </div>
+                        <div id="totp-vault-list" class="totp-vault-grid">
+                            <!-- Populated with stored secrets having TOTP keys -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 5: EXPORT & BACKUP -->
+            <section id="tab-backup" class="tab-content">
+                <div class="grid-2col">
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h2>Export Vault Backup</h2>
+                            <p class="section-desc">Download encrypted or portable backups of your secrets.</p>
+                        </div>
+
+                        <div class="backup-actions">
+                            <div class="backup-option-box">
+                                <h3>Encrypted Sentinel Backup (.sentinel)</h3>
+                                <p>Protected using Master Password AES-256-GCM. Safe for cloud storage.</p>
+                                <button id="btn-export-encrypted" class="btn btn-primary">
+                                    Export Encrypted Backup
+                                </button>
+                            </div>
+
+                            <div class="backup-option-box">
+                                <h3>Plain JSON / CSV Backup</h3>
+                                <p>Compatible with Bitwarden, 1Password, and password managers.</p>
+                                <div class="btn-group">
+                                    <button id="btn-export-json" class="btn btn-outline">Export JSON</button>
+                                    <button id="btn-export-csv" class="btn btn-outline">Export CSV</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h2>Import Secrets Backup</h2>
+                            <p class="section-desc">Restore or migrate secrets from CSV or JSON files.</p>
+                        </div>
+
+                        <div class="import-box">
+                            <input type="file" id="import-file-input" accept=".json,.csv,.sentinel" class="file-input-hidden">
+                            <label for="import-file-input" class="file-drop-zone">
+                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                <span>Click to select backup file (.sentinel, .json, .csv)</span>
+                            </label>
+                            <div id="import-status" class="import-status-text"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- MODAL 1: ADD / EDIT SECRET MODAL -->
+    <div id="modal-secret" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modal-secret-title">Add Secret to Vault</h3>
+                <button class="modal-close" id="btn-close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-secret">
+                    <input type="hidden" id="secret-id">
+
+                    <div class="form-group">
+                        <label for="secret-title">Title / Application *</label>
+                        <input type="text" id="secret-title" class="custom-input" placeholder="e.g. AWS Production Console" required>
+                    </div>
+
+                    <div class="form-row-2col">
+                        <div class="form-group">
+                            <label for="secret-category">Category</label>
+                            <select id="secret-category" class="custom-select">
+                                <option value="Logins">Web Login</option>
+                                <option value="API Keys">API Key / Token</option>
+                                <option value="SSH Keys">SSH Key</option>
+                                <option value="Secure Notes">Secure Note</option>
+                                <option value="Credit Cards">Credit Card</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="secret-username">Username / Email / Key ID</label>
+                            <input type="text" id="secret-username" class="custom-input" placeholder="admin@enterprise.io">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="secret-password">Password / Secret Value *</label>
+                        <div class="input-with-action">
+                            <input type="password" id="secret-password" class="custom-input font-mono" required>
+                            <button type="button" id="btn-modal-toggle-pass" class="btn btn-icon-only">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </button>
+                            <button type="button" id="btn-modal-gen-pass" class="btn btn-outline" title="Generate New High Entropy Password">
+                                Generate
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-row-2col">
+                        <div class="form-group">
+                            <label for="secret-url">Website URL / Host</label>
+                            <input type="url" id="secret-url" class="custom-input" placeholder="https://aws.amazon.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="secret-totp">2FA / TOTP Secret Key (Optional)</label>
+                            <input type="text" id="secret-totp" class="custom-input font-mono" placeholder="Base32 Key e.g. JBSWY3DP...">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="secret-notes">Secure Notes</label>
+                        <textarea id="secret-notes" class="custom-textarea" rows="3" placeholder="Server IPs, recovery codes, security questions..."></textarea>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline" id="btn-cancel-modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save to Encrypted Vault</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

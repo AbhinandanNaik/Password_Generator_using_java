@@ -1,2 +1,5 @@
 # Project exclude paths
 /out/
+MEGA_DEVELOPMENT_PLAN.md
+node_modules/
+dist/

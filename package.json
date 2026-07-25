@@ -1,0 +1,20 @@
+{
+  "name": "sentinelkey-enterprise",
+  "version": "2.0.0",
+  "description": "Enterprise-Grade Zero-Knowledge Password & Secrets Management Suite",
+  "main": "app.js",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx serve ."
+  },
+  "keywords": [
+    "password-generator",
+    "zero-knowledge",
+    "security",
+    "totp",
+    "crypto",
+    "enterprise"
+  ],
+  "author": "SentinelKey Team",
+  "license": "MIT"
+}
