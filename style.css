@@ -1,16 +1,19 @@
 /* ==========================================================================
-   SentinelKey Enterprise - Clean Modern Professional Design System
-   Color Palette: Slate Dark (#0f172a), Card Surface (#1e293b), 
-   Primary Indigo (#3b82f6), Text Main (#f8fafc), Emerald Accent (#10b981)
+   SentinelKey Enterprise - Modern Charcoal & Electric Violet Theme
+   Color Palette: Charcoal Slate (#090d16), Deep Surface (#131b2e), 
+   Primary Electric Violet (#6366f1), Text Main (#f8fafc), Emerald (#10b981)
    ========================================================================== */
 
 :root {
-    /* Core 5-Color System */
-    --color-bg: #0f172a;
-    --color-surface: #1e293b;
-    --color-border: #334155;
-    --color-primary: #3b82f6;
-    --color-primary-hover: #2563eb;
+    /* Modern Charcoal & Electric Violet Color Tokens */
+    --color-bg: #090d16;
+    --color-surface: #131b2e;
+    --color-surface-hover: #1c2742;
+    --color-border: #222f4b;
+    
+    --color-primary: #6366f1;
+    --color-primary-hover: #4f46e5;
+    --primary-badge-bg: rgba(99, 102, 241, 0.15);
 
     --color-text-main: #f8fafc;
     --color-text-muted: #94a3b8;
@@ -18,17 +21,17 @@
 
     --color-success: #10b981;
     --color-warning: #f59e0b;
-    --color-danger: #ef4444;
+    --color-danger: #f43f5e;
 
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     --font-mono: 'Fira Code', monospace;
 
     --radius-sm: 6px;
-    --radius-md: 8px;
-    --radius-lg: 12px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
 
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 8px 24px -4px rgba(0, 0, 0, 0.4);
 }
 
 * {
@@ -58,7 +61,7 @@ body.clean-theme {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 24px;
+    padding: 18px 24px;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
@@ -78,32 +81,33 @@ body.clean-theme {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    background: rgba(59, 130, 246, 0.1);
+    width: 42px;
+    height: 42px;
+    background: var(--primary-badge-bg);
     border: 1px solid var(--color-primary);
     border-radius: var(--radius-md);
     color: var(--color-primary);
 }
 
 .brand-title {
-    font-size: 1.25rem;
+    font-size: 1.3rem;
     font-weight: 700;
     display: flex;
     align-items: center;
     gap: 8px;
     color: var(--color-text-main);
+    letter-spacing: -0.3px;
 }
 
 .badge-enterprise {
     font-size: 0.65rem;
-    padding: 2px 6px;
+    padding: 2px 7px;
     background: var(--color-primary);
     color: #ffffff;
     border-radius: 4px;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
 }
 
 .brand-subtitle {
@@ -116,7 +120,7 @@ body.clean-theme {
     display: flex;
     align-items: center;
     gap: 4px;
-    background: rgba(15, 23, 42, 0.6);
+    background: var(--color-bg);
     padding: 4px;
     border-radius: var(--radius-md);
     border: 1px solid var(--color-border);
@@ -126,7 +130,7 @@ body.clean-theme {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 14px;
+    padding: 8px 16px;
     background: transparent;
     border: none;
     color: var(--color-text-muted);
@@ -145,6 +149,7 @@ body.clean-theme {
 .nav-tab.active {
     color: #ffffff;
     background: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
 }
 
 /* Vault Status Indicator */
@@ -154,7 +159,7 @@ body.clean-theme {
     gap: 8px;
     font-size: 0.8rem;
     font-weight: 600;
-    padding: 6px 12px;
+    padding: 6px 14px;
     background: rgba(16, 185, 129, 0.1);
     border: 1px solid rgba(16, 185, 129, 0.3);
     border-radius: 20px;
@@ -210,9 +215,10 @@ body.clean-theme {
 }
 
 .card-header h2 {
-    font-size: 1.15rem;
+    font-size: 1.2rem;
     font-weight: 600;
     color: var(--color-text-main);
+    letter-spacing: -0.2px;
 }
 
 .section-desc {
@@ -237,9 +243,10 @@ body.clean-theme {
     color: var(--color-text-muted);
     font-size: 0.78rem;
     font-weight: 500;
-    padding: 5px 10px;
+    padding: 6px 12px;
     border-radius: 4px;
     cursor: pointer;
+    transition: all 0.15s ease;
 }
 
 .mode-btn.active {
@@ -285,9 +292,9 @@ body.clean-theme {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 9px 16px;
+    padding: 9px 18px;
     font-size: 0.85rem;
-    font-weight: 500;
+    font-weight: 600;
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: all 0.15s ease;
@@ -297,10 +304,12 @@ body.clean-theme {
 .btn-primary {
     background: var(--color-primary);
     color: #ffffff;
+    box-shadow: 0 2px 10px rgba(99, 102, 241, 0.25);
 }
 
 .btn-primary:hover {
     background: var(--color-primary-hover);
+    transform: translateY(-1px);
 }
 
 .btn-outline {
@@ -311,6 +320,7 @@ body.clean-theme {
 
 .btn-outline:hover {
     background: rgba(255, 255, 255, 0.05);
+    border-color: var(--color-text-muted);
 }
 
 .btn-full {
@@ -318,8 +328,8 @@ body.clean-theme {
 }
 
 .icon-btn {
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -350,8 +360,8 @@ body.clean-theme {
 }
 
 .badge {
-    padding: 2px 8px;
-    background: rgba(59, 130, 246, 0.15);
+    padding: 3px 10px;
+    background: var(--primary-badge-bg);
     color: var(--color-primary);
     border-radius: 12px;
     font-size: 0.75rem;
@@ -406,8 +416,8 @@ body.clean-theme {
 
 .custom-checkbox input {
     accent-color: var(--color-primary);
-    width: 15px;
-    height: 15px;
+    width: 16px;
+    height: 16px;
 }
 
 /* Analytics & Metrics */
@@ -435,7 +445,7 @@ body.clean-theme {
 }
 
 .metric-value {
-    font-size: 1.3rem;
+    font-size: 1.35rem;
     font-weight: 700;
     margin: 4px 0;
     color: var(--color-text-main);
@@ -662,7 +672,7 @@ body.clean-theme {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(15, 23, 42, 0.8);
+    background: rgba(9, 13, 22, 0.8);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -754,7 +764,7 @@ body.clean-theme {
 
 .toast {
     background: var(--color-surface);
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-primary);
     color: var(--color-text-main);
     padding: 10px 16px;
     border-radius: var(--radius-md);
@@ -765,9 +775,9 @@ body.clean-theme {
     gap: 8px;
 }
 
-/* Text Utility Colors (Strictly 4-5 Colors) */
+/* Text Utility Colors */
 .text-main { color: var(--color-text-main); }
-.text-cyan, .text-blue { color: var(--color-primary); }
+.text-cyan, .text-blue, .text-violet { color: var(--color-primary); }
 .text-green { color: var(--color-success); }
 .text-amber { color: var(--color-warning); }
 .text-red { color: var(--color-danger); }
