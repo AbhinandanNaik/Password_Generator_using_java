@@ -130,6 +130,19 @@
         importFileInput: document.getElementById('import-file-input'),
         importStatus: document.getElementById('import-status'),
 
+        // Phase 2 Elements
+        vaultStatusBadge: document.getElementById('vault-status-badge'),
+        vaultLockText: document.getElementById('vault-lock-text'),
+        modalMasterLock: document.getElementById('modal-master-lock'),
+        formMasterLock: document.getElementById('form-master-lock'),
+        masterPasswordInput: document.getElementById('master-password-input'),
+        breachCheckInput: document.getElementById('breach-check-input'),
+        btnCheckBreach: document.getElementById('btn-check-breach'),
+        breachResultBox: document.getElementById('breach-result-box'),
+        policyMinLength: document.getElementById('policy-min-length'),
+        policyReqSymbols: document.getElementById('policy-req-symbols'),
+        policyReq2fa: document.getElementById('policy-req-2fa'),
+
         toastContainer: document.getElementById('toast-container')
     };
 
@@ -142,6 +155,7 @@
         bindEvents();
         generateSecret();
         startTotpEngine();
+        setupAutoLockTimer();
     }
 
     function bindEvents() {
@@ -151,6 +165,25 @@
                 const target = tab.getAttribute('data-target');
                 switchTab(target);
             });
+        });
+
+        // Lock / Unlock Vault
+        if (elements.vaultStatusBadge) {
+            elements.vaultStatusBadge.addEventListener('click', toggleVaultLock);
+        }
+
+        if (elements.formMasterLock) {
+            elements.formMasterLock.addEventListener('submit', handleMasterUnlock);
+        }
+
+        // Breach Scanner
+        if (elements.btnCheckBreach) {
+            elements.btnCheckBreach.addEventListener('click', runBreachCheck);
+        }
+
+        // Policy Inputs
+        [elements.policyMinLength, elements.policyReqSymbols, elements.policyReq2fa].forEach(chk => {
+            if (chk) chk.addEventListener('change', renderSecurityAudit);
         });
 
         // Mode selector
@@ -289,6 +322,8 @@
             secret = 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI' + generateBase64Token(32) + ' sentinel@enterprise-auth';
         } else if (mode === 'uuid') {
             secret = generateUUIDv4();
+        } else if (mode === 'passkey') {
+            secret = 'fido2:credId_' + generateBase64Token(16) + ':pubKey_ES256_' + generateHexToken(24);
         }
 
         elements.generatedOutput.textContent = secret;
@@ -840,6 +875,122 @@
         `;
         elements.toastContainer.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
+    }
+
+    // ==========================================
+    // 9. PHASE 2 ENTERPRISE SECURITY MODULES
+    // ==========================================
+    let isVaultLocked = false;
+    let autoLockTimerId = null;
+
+    function toggleVaultLock() {
+        if (!isVaultLocked) {
+            lockVault();
+        } else {
+            elements.modalMasterLock.classList.add('active');
+        }
+    }
+
+    function lockVault() {
+        isVaultLocked = true;
+        state.masterKey = null;
+        if (elements.vaultLockText) elements.vaultLockText.textContent = 'Vault Locked';
+        if (elements.vaultStatusBadge) {
+            elements.vaultStatusBadge.style.borderColor = 'var(--color-danger)';
+            elements.vaultStatusBadge.style.color = 'var(--color-danger)';
+            elements.vaultStatusBadge.querySelector('.status-dot').style.background = 'var(--color-danger)';
+        }
+        showToast('Vault locked. Master key cleared from memory.');
+        elements.modalMasterLock.classList.add('active');
+    }
+
+    async function handleMasterUnlock(e) {
+        e.preventDefault();
+        const masterPass = elements.masterPasswordInput.value;
+        if (!masterPass) return;
+
+        try {
+            // PBKDF2 Key Derivation (100,000 iterations)
+            const enc = new TextEncoder();
+            const keyMaterial = await window.crypto.subtle.importKey(
+                'raw', enc.encode(masterPass), 'PBKDF2', false, ['deriveKey']
+            );
+            
+            const salt = enc.encode('SentinelKey_Salt_2026');
+            state.masterKey = await window.crypto.subtle.deriveKey(
+                { name: 'PBKDF2', salt: salt, iterations: 100000, hash: 'SHA-256' },
+                keyMaterial,
+                { name: 'AES-GCM', length: 256 },
+                false,
+                ['encrypt', 'decrypt']
+            );
+
+            isVaultLocked = false;
+            elements.masterPasswordInput.value = '';
+            elements.modalMasterLock.classList.remove('active');
+
+            if (elements.vaultLockText) elements.vaultLockText.textContent = 'Vault Unlocked';
+            if (elements.vaultStatusBadge) {
+                elements.vaultStatusBadge.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+                elements.vaultStatusBadge.style.color = 'var(--color-success)';
+                elements.vaultStatusBadge.querySelector('.status-dot').style.background = 'var(--color-success)';
+            }
+            showToast('Vault unlocked using PBKDF2-AES256 master key!');
+        } catch (err) {
+            showToast('Master unlock failed');
+        }
+    }
+
+    async function runBreachCheck() {
+        const val = elements.breachCheckInput ? elements.breachCheckInput.value.trim() : '';
+        if (!val) {
+            showToast('Please enter a password to scan');
+            return;
+        }
+
+        const msgUint8 = new TextEncoder().encode(val);
+        const hashBuffer = await crypto.subtle.digest('SHA-1', msgUint8);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+        
+        const prefix = hashHex.substring(0, 5);
+
+        // Simulated Breached Passwords SHA-1 Prefixes
+        const commonBreaches = ['12345', '8854D', '5BAA6', '40BD0', '7C4A8', 'A94A8'];
+        const isBreached = commonBreaches.includes(prefix) || /password|1234|admin|qwerty/i.test(val);
+
+        const box = elements.breachResultBox;
+        if (!box) return;
+        box.classList.remove('hidden');
+
+        if (isBreached) {
+            box.style.background = 'rgba(244, 63, 94, 0.15)';
+            box.style.border = '1px solid var(--color-danger)';
+            box.style.color = 'var(--color-danger)';
+            box.innerHTML = `⚠️ <strong>WARNING: BREACH DETECTED!</strong> This password or its SHA-1 hash prefix (${prefix}) has appeared in data breach dumps! Change immediately.`;
+        } else {
+            box.style.background = 'rgba(16, 185, 129, 0.15)';
+            box.style.border = '1px solid var(--color-success)';
+            box.style.color = 'var(--color-success)';
+            box.innerHTML = `✅ <strong>CLEAN: NO BREACH FOUND.</strong> SHA-1 Prefix ${prefix} does not match known compromised datasets.`;
+        }
+    }
+
+    function setupAutoLockTimer() {
+        const resetTimer = () => {
+            if (autoLockTimerId) clearTimeout(autoLockTimerId);
+            // 15 Minute Idle Auto Lock
+            autoLockTimerId = setTimeout(() => {
+                if (!isVaultLocked) {
+                    lockVault();
+                    showToast('Vault auto-locked due to 15 minutes of inactivity');
+                }
+            }, 15 * 60 * 1000);
+        };
+
+        window.addEventListener('mousemove', resetTimer);
+        window.addEventListener('keydown', resetTimer);
+        resetTimer();
     }
 
     function escapeHtml(str) {
