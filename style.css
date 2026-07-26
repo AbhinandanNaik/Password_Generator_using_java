@@ -765,3 +765,83 @@ body.clean-theme {
 .text-red { color: var(--color-danger); }
 .text-dim { color: var(--color-text-dim); }
 .hidden { display: none !important; }
+
+/* THEME VARIATIONS */
+body.theme-slate {
+    --color-bg: #f1f5f9;
+    --color-surface: #ffffff;
+    --color-border: #cbd5e1;
+    --color-primary: #4f46e5;
+    --color-text-main: #0f172a;
+    --color-text-muted: #475569;
+    --color-text-dim: #94a3b8;
+}
+
+body.theme-midnight {
+    --color-bg: #090514;
+    --color-surface: #120b29;
+    --color-border: #291a52;
+    --color-primary: #8b5cf6;
+    --color-text-main: #f3e8ff;
+    --color-text-muted: #c084fc;
+    --color-text-dim: #6b21a8;
+}
+
+body.theme-cyberpunk {
+    --color-bg: #050b14;
+    --color-surface: #0a192f;
+    --color-border: #172a45;
+    --color-primary: #00f0ff;
+    --color-text-main: #e6f1ff;
+    --color-text-muted: #8892b0;
+    --color-text-dim: #495670;
+}
+
+/* COMMAND PALETTE STYLING */
+.cmd-results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cmd-item {
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--color-text-main);
+    background: var(--color-bg);
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+}
+
+.cmd-item:hover, .cmd-item.selected {
+    background: var(--color-surface);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.cmd-item-title {
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.cmd-item-badge {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    background: var(--color-border);
+    border-radius: 4px;
+    color: var(--color-text-muted);
+}
+
+.output-box {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    word-break: break-all;
+    font-size: 0.85rem;
+    color: var(--color-primary);
+}

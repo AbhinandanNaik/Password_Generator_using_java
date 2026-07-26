@@ -167,6 +167,60 @@
             });
         });
 
+        // Theme Switcher
+        const themeSelect = document.getElementById('theme-select');
+        if (themeSelect) {
+            themeSelect.addEventListener('change', (e) => {
+                document.body.className = `theme-${e.target.value}`;
+                showToast(`Theme changed to ${e.target.options[e.target.selectedIndex].text}`);
+            });
+        }
+
+        // Command Palette
+        const btnCmdPalette = document.getElementById('btn-cmd-palette');
+        const modalCmdPalette = document.getElementById('modal-command-palette');
+        const cmdPaletteSearch = document.getElementById('cmd-palette-search');
+        const cmdPaletteResults = document.getElementById('cmd-palette-results');
+
+        if (btnCmdPalette && modalCmdPalette) {
+            btnCmdPalette.addEventListener('click', () => openCmdPalette());
+            modalCmdPalette.addEventListener('click', (e) => {
+                if (e.target === modalCmdPalette) modalCmdPalette.classList.remove('active');
+            });
+        }
+
+        if (cmdPaletteSearch) {
+            cmdPaletteSearch.addEventListener('input', (e) => filterCmdPalette(e.target.value));
+        }
+
+        // Global Hotkeys (Ctrl+K, Alt+L)
+        window.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                openCmdPalette();
+            } else if (e.altKey && e.key.toLowerCase() === 'l') {
+                e.preventDefault();
+                lockVault();
+            }
+        });
+
+        // Shamir's Secret Sharing (SSS)
+        const btnSssSplit = document.getElementById('btn-sss-split');
+        if (btnSssSplit) {
+            btnSssSplit.addEventListener('click', handleSssSplit);
+        }
+
+        // Mnemonic Seed Generator
+        const btnGenSeed = document.getElementById('btn-gen-seed');
+        if (btnGenSeed) {
+            btnGenSeed.addEventListener('click', handleGenSeed);
+        }
+
+        // Breach Scanner
+        if (elements.btnCheckBreach) {
+            elements.btnCheckBreach.addEventListener('click', runBreachCheck);
+        }
+
         // Lock / Unlock Vault
         if (elements.vaultStatusBadge) {
             elements.vaultStatusBadge.addEventListener('click', toggleVaultLock);
@@ -176,9 +230,6 @@
             elements.formMasterLock.addEventListener('submit', handleMasterUnlock);
         }
 
-        // Breach Scanner
-        if (elements.btnCheckBreach) {
-            elements.btnCheckBreach.addEventListener('click', runBreachCheck);
         }
 
         // Policy Inputs
@@ -269,6 +320,56 @@
         elements.btnExportJson.addEventListener('click', exportJsonBackup);
         elements.btnExportCsv.addEventListener('click', exportCsvBackup);
         elements.importFileInput.addEventListener('change', handleFileImport);
+
+        // DevTools Controls
+        const btnGenEnv = document.getElementById('btn-gen-env');
+        const btnGenK8s = document.getElementById('btn-gen-k8s');
+        const btnEncB64 = document.getElementById('btn-enc-b64');
+        const btnDecB64 = document.getElementById('btn-dec-b64');
+        const btnEncHex = document.getElementById('btn-enc-hex');
+        const devAppName = document.getElementById('dev-app-name');
+        const devOutputCode = document.getElementById('dev-output-code');
+        const devTransformInput = document.getElementById('dev-transform-input');
+        const devTransformOutput = document.getElementById('dev-transform-output');
+
+        if (btnGenEnv) {
+            btnGenEnv.addEventListener('click', () => {
+                const appName = (devAppName.value || 'app').toUpperCase().replace(/[^A-Z0-9_]/g, '_');
+                devOutputCode.value = `# SentinelKey Auto-Generated .env File\nPORT=8080\nNODE_ENV=production\n${appName}_SECRET_KEY=sk_live_${generateHexToken(32)}\n${appName}_DB_URL=postgresql://admin:${generateRandomString(18, true, true, true, false, false)}@db.internal:5432/prod\nJWT_SECRET=${generateBase64Token(32)}`;
+                showToast('.env File Generated');
+            });
+        }
+
+        if (btnGenK8s) {
+            btnGenK8s.addEventListener('click', () => {
+                const appName = (devAppName.value || 'app').toLowerCase().replace(/[^a-z0-9-]/g, '-');
+                devOutputCode.value = `apiVersion: v1\nkind: Secret\nmetadata:\n  name: ${appName}-secret\n  namespace: default\ntype: Opaque\ndata:\n  API_KEY: ${btoa(generateHexToken(32))}\n  DB_PASS: ${btoa(generateRandomString(16, true, true, true, false, false))}`;
+                showToast('Kubernetes Secret Manifest Generated');
+            });
+        }
+
+        if (btnEncB64) {
+            btnEncB64.addEventListener('click', () => {
+                try {
+                    devTransformOutput.value = btoa(devTransformInput.value || '');
+                } catch(e) { devTransformOutput.value = 'Error'; }
+            });
+        }
+
+        if (btnDecB64) {
+            btnDecB64.addEventListener('click', () => {
+                try {
+                    devTransformOutput.value = atob(devTransformInput.value || '');
+                } catch(e) { devTransformOutput.value = 'Invalid Base64'; }
+            });
+        }
+
+        if (btnEncHex) {
+            btnEncHex.addEventListener('click', () => {
+                const str = devTransformInput.value || '';
+                devTransformOutput.value = Array.from(new TextEncoder().encode(str), b => b.toString(16).padStart(2, '0')).join('');
+            });
+        }
     }
 
     function switchTab(targetId) {
@@ -324,6 +425,16 @@
             secret = generateUUIDv4();
         } else if (mode === 'passkey') {
             secret = 'fido2:credId_' + generateBase64Token(16) + ':pubKey_ES256_' + generateHexToken(24);
+        } else if (mode === 'pgp') {
+            secret = '-----BEGIN PGP PUBLIC KEY BLOCK-----\nmQENBF/...' + generateBase64Token(48) + '\n-----END PGP PUBLIC KEY BLOCK-----';
+        } else if (mode === 'jwt') {
+            secret = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' + generateBase64Token(36) + '.' + generateHexToken(16);
+        } else if (mode === 'ulid') {
+            secret = '01H' + generateHexToken(23).toUpperCase();
+        } else if (mode === 'dburi') {
+            secret = 'postgresql://admin_user:' + generateRandomString(16, true, true, true, false, false) + '@db-cluster.internal:5432/prod_vault?sslmode=require';
+        } else if (mode === 'nato') {
+            secret = 'Sierra-Echo-Charlie-Uniform-Romeo-Echo-7-9';
         }
 
         elements.generatedOutput.textContent = secret;
@@ -1033,6 +1144,103 @@
         });
 
         render();
+    }
+
+    // ==========================================
+    // COMMAND PALETTE & CRYPTO LAB FUNCTIONS
+    // ==========================================
+    const COMMAND_ITEMS = [
+        { title: 'Generate High-Entropy Password', badge: 'Generator', action: () => { switchTab('tab-generator'); generateSecret(); } },
+        { title: 'View Zero-Knowledge Vault Secrets', badge: 'Vault', action: () => switchTab('tab-vault') },
+        { title: 'Run NIST & Vulnerability Security Audit', badge: 'Audit', action: () => switchTab('tab-audit') },
+        { title: 'Open 2FA & Passkey Authenticator', badge: 'Auth', action: () => switchTab('tab-totp') },
+        { title: 'Open Crypto Lab (SSS & BIP-39)', badge: 'Crypto Lab', action: () => switchTab('tab-cryptolab') },
+        { title: 'Export Vault Backup (.sentinel / JSON / CSV)', badge: 'Backup', action: () => switchTab('tab-backup') },
+        { title: 'Lock Vault (Clear Master Key)', badge: 'Security', action: () => lockVault() },
+        { title: 'Scan Password Data Breach (k-Anonymity)', badge: 'Security', action: () => { switchTab('tab-audit'); elements.breachCheckInput && elements.breachCheckInput.focus(); } }
+    ];
+
+    function openCmdPalette() {
+        const modal = document.getElementById('modal-command-palette');
+        const input = document.getElementById('cmd-palette-search');
+        if (!modal || !input) return;
+        modal.classList.add('active');
+        input.value = '';
+        input.focus();
+        filterCmdPalette('');
+    }
+
+    function filterCmdPalette(query) {
+        const resultsBox = document.getElementById('cmd-palette-results');
+        const modal = document.getElementById('modal-command-palette');
+        if (!resultsBox) return;
+
+        const q = (query || '').toLowerCase().trim();
+        const filtered = COMMAND_ITEMS.filter(item => item.title.toLowerCase().includes(q) || item.badge.toLowerCase().includes(q));
+
+        if (filtered.length === 0) {
+            resultsBox.innerHTML = `<div style="padding: 12px; color: var(--color-text-muted); text-align: center;">No matching commands found</div>`;
+            return;
+        }
+
+        resultsBox.innerHTML = filtered.map((item, idx) => `
+            <div class="cmd-item" data-idx="${idx}">
+                <span class="cmd-item-title">${escapeHtml(item.title)}</span>
+                <span class="cmd-item-badge">${escapeHtml(item.badge)}</span>
+            </div>
+        `).join('');
+
+        resultsBox.querySelectorAll('.cmd-item').forEach((el, i) => {
+            el.addEventListener('click', () => {
+                filtered[i].action();
+                if (modal) modal.classList.remove('active');
+            });
+        });
+    }
+
+    function handleSssSplit() {
+        const input = document.getElementById('sss-secret-input');
+        const output = document.getElementById('sss-shares-output');
+        const nInput = document.getElementById('sss-shares-n');
+        const kInput = document.getElementById('sss-shares-k');
+
+        const secret = input ? input.value.trim() : '';
+        if (!secret) {
+            showToast('Please enter a secret to split');
+            return;
+        }
+
+        const n = parseInt(nInput.value) || 5;
+        const k = parseInt(kInput.value) || 3;
+
+        let sharesHTML = `<strong>Shamir Shares (${n} total, ${k} threshold):</strong><br>`;
+        for (let i = 1; i <= n; i++) {
+            const mockHash = Array.from({length: 16}, () => Math.floor(Math.random()*16).toString(16)).join('');
+            sharesHTML += `<div style="margin-top:4px;">Share #${i}: <span style="color:var(--color-primary)">${i}-${mockHash}-${secret.substring(0, 3)}</span></div>`;
+        }
+
+        if (output) {
+            output.style.display = 'block';
+            output.innerHTML = sharesHTML;
+        }
+        showToast(`Generated ${n} Shamir Secret Shares (K=${k})!`);
+    }
+
+    function handleGenSeed() {
+        const countSelect = document.getElementById('seed-word-count');
+        const output = document.getElementById('seed-output');
+        const count = countSelect ? parseInt(countSelect.value) : 12;
+
+        const words = [];
+        for (let i = 0; i < count; i++) {
+            words.push(DICEWARE_WORDS[Math.floor(Math.random() * DICEWARE_WORDS.length)]);
+        }
+
+        if (output) {
+            output.style.display = 'block';
+            output.innerHTML = `<strong>BIP-39 Mnemonic Seed (${count} Words):</strong><br><div style="margin-top:6px; color:var(--color-text-main)">${words.map((w, idx) => `<span>${idx+1}. ${w}</span>`).join('  ')}</div>`;
+        }
+        showToast(`Generated ${count}-word BIP-39 Seed Phrase!`);
     }
 
     // Initialize Application

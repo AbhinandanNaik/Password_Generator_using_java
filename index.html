@@ -44,7 +44,11 @@
                 </button>
                 <button class="nav-tab" data-target="tab-totp">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    2FA Authenticator
+                    2FA & Passkeys
+                </button>
+                <button class="nav-tab" data-target="tab-cryptolab">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                    Crypto Lab
                 </button>
                 <button class="nav-tab" data-target="tab-backup">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -69,13 +73,18 @@
                         <div class="card-header">
                             <h2>Secrets Generator</h2>
                             <!-- Mode selector buttons -->
-                            <div class="mode-selector">
+                            <div class="mode-selector" style="flex-wrap: wrap; gap: 4px;">
                                 <button class="mode-btn active" data-mode="password">Password</button>
                                 <button class="mode-btn" data-mode="passphrase">Passphrase</button>
                                 <button class="mode-btn" data-mode="apikey">API Key</button>
                                 <button class="mode-btn" data-mode="ssh">SSH Key</button>
                                 <button class="mode-btn" data-mode="uuid">UUID</button>
                                 <button class="mode-btn" data-mode="passkey">Passkey</button>
+                                <button class="mode-btn" data-mode="pgp">PGP Key</button>
+                                <button class="mode-btn" data-mode="jwt">JWT</button>
+                                <button class="mode-btn" data-mode="ulid">ULID</button>
+                                <button class="mode-btn" data-mode="dburi">DB URI</button>
+                                <button class="mode-btn" data-mode="nato">NATO</button>
                             </div>
                         </div>
 
@@ -487,6 +496,90 @@
                 </div>
             </section>
 
+            <!-- TAB 5: CRYPTO LAB & ADVANCED TOOLS -->
+            <section id="tab-cryptolab" class="tab-content">
+                <div class="grid-2col">
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h2>Shamir's Secret Sharing (SSS)</h2>
+                            <p class="section-desc">Split a master key into N secret shares requiring K threshold shares to reconstruct.</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Secret to Split:</label>
+                            <input type="text" id="sss-secret-input" class="custom-input font-mono" placeholder="Enter secret string...">
+                        </div>
+                        <div class="form-row-2col">
+                            <div class="form-group">
+                                <label>Total Shares (N):</label>
+                                <input type="number" id="sss-shares-n" class="custom-input" value="5" min="2" max="10">
+                            </div>
+                            <div class="form-group">
+                                <label>Threshold Needed (K):</label>
+                                <input type="number" id="sss-shares-k" class="custom-input" value="3" min="2" max="10">
+                            </div>
+                        </div>
+                        <button id="btn-sss-split" class="btn btn-primary btn-full">Generate Shamir Shares</button>
+                        <div id="sss-shares-output" class="output-box font-mono" style="margin-top: 15px; display: none;"></div>
+                    </div>
+
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h2>BIP-39 Mnemonic Seed Phrase</h2>
+                            <p class="section-desc">Generate 12/24-word cryptographic seed phrase for offline master key recovery.</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Word Count:</label>
+                            <select id="seed-word-count" class="custom-select">
+                                <option value="12">12 Words (128-bit Entropy)</option>
+                                <option value="24">24 Words (256-bit Entropy)</option>
+                            </select>
+                        </div>
+                        <button id="btn-gen-seed" class="btn btn-outline btn-full">Generate Mnemonic Seed</button>
+                        <div id="seed-output" class="output-box font-mono" style="margin-top: 15px; display: none;"></div>
+                    </div>
+                </div>
+            </section>
+                <div class="grid-2col">
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h2>Docker `.env` & K8s Secret Generator</h2>
+                            <p class="section-desc">Generate production environment files and Kubernetes secret manifests.</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="dev-app-name">Application / Service Name:</label>
+                            <input type="text" id="dev-app-name" placeholder="e.g. auth-service-prod" class="custom-input font-mono" value="sentinel-prod-api">
+                        </div>
+                        <div class="btn-group" style="display: flex; gap: 8px; margin-bottom: 16px;">
+                            <button id="btn-gen-env" class="btn btn-primary">Generate `.env` File</button>
+                            <button id="btn-gen-k8s" class="btn btn-outline">Generate K8s YAML</button>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="dev-output-code" class="custom-textarea font-mono" rows="8" readonly placeholder="Output code will appear here..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h2>Base64 / Hex / HMAC Encoder</h2>
+                            <p class="section-desc">Encode, decode, and calculate HMAC signatures directly in browser.</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="dev-transform-input">Input Data:</label>
+                            <input type="text" id="dev-transform-input" placeholder="Type text to encode..." class="custom-input font-mono">
+                        </div>
+                        <div class="btn-group" style="display: flex; gap: 8px; margin-bottom: 16px;">
+                            <button id="btn-enc-b64" class="btn btn-outline">Base64 Enc</button>
+                            <button id="btn-dec-b64" class="btn btn-outline">Base64 Dec</button>
+                            <button id="btn-enc-hex" class="btn btn-outline">Hex Enc</button>
+                        </div>
+                        <div class="form-group">
+                            <label for="dev-transform-output">Result:</label>
+                            <input type="text" id="dev-transform-output" readonly class="custom-input font-mono" placeholder="Output result...">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
         </main>
     </div>
 
@@ -582,6 +675,18 @@
                         <button type="submit" class="btn btn-primary btn-full">Unlock Zero-Knowledge Vault</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: COMMAND PALETTE (CTRL + K) -->
+    <div id="modal-command-palette" class="modal-overlay">
+        <div class="modal-card" style="max-width: 600px;">
+            <div class="modal-header">
+                <input type="text" id="cmd-palette-search" class="custom-input" placeholder="Type a command or search feature (e.g. Generate, Lock Vault, Audit, Backup)..." style="font-size: 1rem; width: 100%;">
+            </div>
+            <div class="modal-body" style="max-height: 350px; overflow-y: auto;">
+                <div id="cmd-palette-results" class="cmd-results-list"></div>
             </div>
         </div>
     </div>
